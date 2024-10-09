@@ -1,0 +1,71 @@
+---
+title: "Time Modules"
+author: "Sanket"
+date: "2024-10-09"
+output: html_document
+---
+
+```{r}
+
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+#install.packages
+library(readxl)
+library(knitr)
+library(TTR)
+library(dplyr)
+library(ggplot2)
+library(forecast)
+
+# Load the Excel file
+file_path <- "C:/Users/Sanket Khamkar/Downloads/Data Dictionary_Sanket.xlsx"
+data <- read_excel(file_path)
+knitr::kable(data)
+head(data)
+
+# Function to convert 'Year_Quarter' to start date for each quarter
+convert_quarter_to_date <- function(quarter) {
+  if (is.na(quarter)) {
+    return(NA)  # Return NA if quarter is missing
+  }
+  year <- as.numeric(substr(quarter, 1, 4))
+  q <- substr(quarter, 6, 7)
+  
+  if (q == "Q1") {
+    return(as.Date(paste0(year, "-01-01")))
+  } else if (q == "Q2") {
+    return(as.Date(paste0(year, "-04-01")))
+  } else if (q == "Q3") {
+    return(as.Date(paste0(year, "-07-01")))
+  } else if (q == "Q4") {
+    return(as.Date(paste0(year, "-10-01")))
+  } else {
+    return(NA)  # Return NA if the quarter is not in a recognized format
+  }
+}
+
+# Apply the conversion to the 'Year Quarter' column
+data$Date <- sapply(data$`Year_Quarter`, convert_quarter_to_date)
+
+# Convert the 'Rate' column to numeric and clean up the data
+data$Rate <- as.numeric(data$Rate)
+data <- data[!is.na(data$Date) & !is.na(data$Rate), ]
+
+# Create a time series object with quarterly frequency (4 quarters per year)
+ts_data <- ts(data$Rate, start=c(2022, 1), frequency=4)
+plot(ts_data)
+acf(ts_data)
+str(data$Rate)
+
+##Decomposition
+decomp <- decompose(ts_data, type = "additive")  
+# Plot the Decomposition
+plot(decomp)
+#The choice of whether to use additive or multiplicative decomposition depends on the relationship between the components (trend, seasonal, residual) and the data.
+#In this case, additive decomposition seems appropriate based on the dataset because the seasonal effects likely do not change in magnitude with the trend.
+
+
+
+
+
+```
