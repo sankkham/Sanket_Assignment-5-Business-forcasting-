@@ -1,7 +1,7 @@
 ---
 title: "Time Modules"
 author: "Sanket"
-date: "2024-10-09"
+date: "2024-10-11"
 output: html_document
 ---
 
@@ -64,7 +64,27 @@ plot(decomp)
 #The choice of whether to use additive or multiplicative decomposition depends on the relationship between the components (trend, seasonal, residual) and the data.
 #In this case, additive decomposition seems appropriate based on the dataset because the seasonal effects likely do not change in magnitude with the trend.
 
+stl_decomp <- stl(ts_data,s.window ="periodic")
+plot(stl_decomp)
+attributes(stl_decomp)
 
+# Lets print out a seasonal adjustment
+seasadj(stl_decomp)
+# Plot a line on the graph
+plot(ts_data)
+lines(seasadj(stl_decomp), col="Red")
+# Default period forecast
+f_stl <- forecast(stl_decomp)
+# you can pass the # of period
+f_stl <- forecast(stl_decomp,h=15)
+f_stl
+plot(f_stl)
+# There is more than one way to do things
+decomp_elec <- decompose(ts_data)
+
+# Each one shows different attributes 
+attributes(decomp_elec)
+seasadj(decomp_elec)
 
 
 
